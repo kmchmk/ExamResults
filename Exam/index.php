@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <?php
 
-$requestURl = "http://localhost/ExamBackEnd/request.php";
-$thisPageURL = "http://localhost/Exam/index.php";
+$requestURl = "http://localhost/ExamResults/ExamBackEnd/request.php";
+$thisPageURL = "http://localhost/ExamResults/Exam/index.php";
 
 $index = "";
 $table = "";
