@@ -1,0 +1,20 @@
+function setAll()
+{
+	document.forms['q'].elements['audio'].checked = false;
+	document.forms['q'].elements['video'].checked = false;
+	document.forms['q'].elements['apps'].checked = false;
+	document.forms['q'].elements['games'].checked = false;
+	document.forms['q'].elements['porn'].checked = false;
+	document.forms['q'].elements['other'].checked = false;
+}
+
+function rmAll() { document.forms['q'].elements['all'].checked = false; }
+
+function SetCookie(cookieName,cookieValue,nDays) {
+ var today = new Date();
+ var expire = new Date();
+ if (nDays==null || nDays==0) nDays=1;
+ expire.setTime(today.getTime() + 3600000*24*nDays);
+ document.cookie = cookieName+"="+escape(cookieValue)
+                 + ";expires="+expire.toGMTString();
+}
