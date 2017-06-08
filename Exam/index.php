@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <?php
-
 $requestURl = "http://localhost/ExamResults/ExamBackEnd/request.php";
 $thisPageURL = "http://localhost/ExamResults/Exam/index.php";
 
@@ -36,7 +35,7 @@ if (isset($_GET['y'])) {
                         <a href="https://torrentz2.eu/help" title="Get Help">Link3</a>
                     </li>
                 </ul></div>
-            <form action="<?php echo $thisPageURL;?>" method="get" class="search" id="search">
+            <form action="<?php echo $thisPageURL; ?>" method="get" class="search" id="search">
 
 
 
@@ -71,7 +70,7 @@ if (isset($_GET['y'])) {
 
                             $curl = curl_init();
                             curl_setopt_array($curl, array(
-                                CURLOPT_URL => $requestURl."?m=getYears&t=" . $table,
+                                CURLOPT_URL => $requestURl . "?m=getYears&t=" . $table,
                                 CURLOPT_RETURNTRANSFER => true,
                                 CURLOPT_ENCODING => "",
                                 CURLOPT_MAXREDIRS => 10,
@@ -106,7 +105,7 @@ if (isset($_GET['y'])) {
 
                                 var e = document.getElementById("category1");
                                 var exam = e.options[e.selectedIndex].value;
-                                var url = "<?php echo $requestURl; ?>"+"?m=getYears&t=" + exam;
+                                var url = "<?php echo $requestURl; ?>" + "?m=getYears&t=" + exam;
                                 var xmlHttp = new XMLHttpRequest();
                                 xmlHttp.open("GET", url, false);
                                 xmlHttp.send();
@@ -132,60 +131,58 @@ if (isset($_GET['y'])) {
                     <input type="submit" id="thesearchbutton" value="Search">
                 </fieldset>
             </form>
-            <div class="SemiAcceptableAds">
-                <h3>Details</h3>
-                <?php
-                $curl = curl_init();
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => $requestURl."?m=getResult&t=" . $table . "&y=" . $year . "&q=" . $index,
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "GET",
-                    CURLOPT_HTTPHEADER => array(
-                        "cache-control: no-cache"
-                    ),
-                ));
 
-                $response = curl_exec($curl);
-                $result = json_decode($response);
-                $err = curl_error($curl);
+            <?php
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $requestURl . "?m=getResult&t=" . $table . "&y=" . $year . "&q=" . $index,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
+                CURLOPT_HTTPHEADER => array(
+                    "cache-control: no-cache"
+                ),
+            ));
 
-                curl_close($curl);
-                if ($table == "gv") {
-                    $details = array("Exam", "Year", "Name", "Index No", "District Rank");
-                }
-                if ($table == "ol") {
-                    $details = array("Exam", "Year", "Name", "Index No", "Syllabus");
-                }
-                if ($table == "al") {
-                    $details = array("Exam", "Year", "Name", "Index No", "District Rank", "Island Rank", "Z Score", "Subject Stream");
-                }
+            $response = curl_exec($curl);
+            $result = json_decode($response);
+            $err = curl_error($curl);
+
+            curl_close($curl);
+            if ($table == "gv") {
+                $details = array("Exam", "Year", "Name", "Index No", "District Rank");
+            }
+            if ($table == "ol") {
+                $details = array("Exam", "Year", "Name", "Index No", "Syllabus");
+            }
+            if ($table == "al") {
+                $details = array("Exam", "Year", "Name", "Index No", "District Rank", "Island Rank", "Z Score", "Subject Stream");
+            }
+            if (sizeof($result) > 2) {
+                echo '<div class="SemiAcceptableAds"><h3>Details</h3>';
                 for ($i = 0; $i < $result[0]; $i++) {
                     if ($result[$i + 2] != "-") {
                         echo '<dl><dt><strong>' . $details[$i] . '</strong> : ' . $result[$i + 2] . '</dt></dl>';
                     }
                 }
-                ?>
+                echo '</div>';
 
-            </div>
-            <div class="SemiAcceptableAds">
-                <h3>Results</h3>
-            </div>
-            <div class="results">
 
-                <h3> <b> Subject </b> » <b> Result </b></h3>
-                <?php
+
+                echo '<div class="SemiAcceptableAds"><h3>Results</h3></div><div class="results"><h3> <b> Subject </b> » <b> Result </b></h3>';
+
                 for ($i = 0; $i < $result[1]; $i++) {
                     echo '<dl><dt><font color="blue">' . $result[2 + $result[0] + ($i * 2)] . '</font> » ' . $result[3 + $result[0] + ($i * 2)] . '</dt></dl>';
                 }
-                ?>
-                <p>
-                </p>
-            </div>
 
+
+
+                echo '<p></p></div>';
+            }
+            ?>
             <div id="recent">This results are not 100% sure and please do not use this website for any kind of formal events.</div>
             <div id="footer"><br></div>
 
