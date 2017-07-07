@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <?php
-$requestURl = "http://localhost/ExamResults/ExamBackEnd/request.php";
-$thisPageURL = "http://localhost/ExamResults/Exam/index.php";
+
+$URLfile = fopen("URLs.txt", "r") or die("Unable to open file!");
+$requestURL = trim(fgets($URLfile));
+$thisPageURL = trim(fgets($URLfile));
+fclose($URLfile);
 
 $index = "";
 $table = "";
@@ -70,7 +73,7 @@ if (isset($_GET['y'])) {
 
                             $curl = curl_init();
                             curl_setopt_array($curl, array(
-                                CURLOPT_URL => $requestURl . "?m=getYears&t=" . $table,
+                                CURLOPT_URL => $requestURL . "?m=getYears&t=" . $table,
                                 CURLOPT_RETURNTRANSFER => true,
                                 CURLOPT_ENCODING => "",
                                 CURLOPT_MAXREDIRS => 10,
@@ -105,7 +108,7 @@ if (isset($_GET['y'])) {
 
                                 var e = document.getElementById("category1");
                                 var exam = e.options[e.selectedIndex].value;
-                                var url = "<?php echo $requestURl; ?>" + "?m=getYears&t=" + exam;
+                                var url = "<?php echo $requestURL; ?>" + "?m=getYears&t=" + exam;
                                 var xmlHttp = new XMLHttpRequest();
                                 xmlHttp.open("GET", url, false);
                                 xmlHttp.send();
@@ -135,7 +138,7 @@ if (isset($_GET['y'])) {
             <?php
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL => $requestURl . "?m=getResult&t=" . $table . "&y=" . $year . "&q=" . $index,
+                CURLOPT_URL => $requestURL . "?m=getResult&t=" . $table . "&y=" . $year . "&q=" . $index,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => "",
                 CURLOPT_MAXREDIRS => 10,

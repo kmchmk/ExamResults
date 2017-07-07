@@ -1,4 +1,11 @@
 <?php
+$file = fopen("config.txt", "r") or die("Unable to open file!");
+$servername = trim(fgets($file));
+$username = trim(fgets($file));
+$password = trim(fgets($file));
+$dbname = trim(fgets($file));
+fclose($file);
+
 
 if (isset($_GET["q"])) {
     $index = $_GET["q"];
@@ -14,15 +21,11 @@ if (isset($_GET["y"])) {
 }
 
 
-$servername = "localhost";
-$username = "root";
-$password = "1234";
-$dbname = "exam";
 
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
-
+//$conn = new mysqli("localhost", "root", "1234", "exam");
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
