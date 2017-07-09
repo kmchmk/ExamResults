@@ -1,4 +1,5 @@
 <?php
+
 $file = fopen("config.txt", "r") or die("Unable to open file!");
 $servername = trim(fgets($file));
 $username = trim(fgets($file));
@@ -30,6 +31,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+
 if ($method == "getResult") {
     $sql = "SELECT * FROM " . $table . "result WHERE year = '$year' and indexNo = '$index'";
     $result = $conn->query($sql);
