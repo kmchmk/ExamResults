@@ -1,23 +1,15 @@
-#!/usr/bin/python3
-
-
-import threading
+import logging
+from queue import Queue
+from threading import Thread
 import requests
 
-
-def prefix_zeros(number, length_should_be):
-    diff = length_should_be - len(str(number))
-    return ("0"*diff) + str(number)
-
-
-def get_day_str(day):
-    length_should_be = 3
-    return prefix_zeros(day, length_should_be)
+starting_index = 5000000
+ending_index = 10000000
+thread_count = 100
+file_name = "results_2022.txt"
 
 
-def get_last_number_str(last_number):
-    length_should_be = 5
-    return prefix_zeros(last_number, length_should_be)
+logging.basicConfig(filename='application.log', encoding='utf-8', level=logging.INFO)
 
 
 def fetch_results(url):
@@ -29,56 +21,73 @@ def valid_result(results):
     return "Invalid Index/NIC Number" not in results
 
 
-def append_to_file(file_name, results):
-    file = open(file_name, "a")
-    file.write(results + "\n")
-    file.close()
-
-
-def get_results_for_the_day(day):
+def append_to_file(results):
     try:
-        day_str = get_day_str(day)
-        file_name = "results_{}.txt".format(day_str)
-        for last_number in range(0, 1000000):
-            last_number_str = get_last_number_str(last_number)
-            nic = "2000{}{}".format(day_str, last_number_str)
-            url = "https://result.doenets.lk/result/service/AlResult?index=&nic={}".format(nic)
-            results = fetch_results(url)
-            if valid_result(results):
-                append_to_file(file_name, results)
-                print(nic, "Successful.", flush=True)
-            else:
-                print(nic, "Failed", flush=True)
+        file = open(file_name, "a")
+        file.write(results + "\n")
+        file.close()
     except:
-        print("ERROR in", day, flush=True)
+        logging.error("Error writing file.")
 
 
-def save_results_for_range(start, end):
-    threads = []
-    for day in range(start, end):
-        thread = threading.Thread(target=get_results_for_the_day, args=(day,))
-        thread.start()
-        threads.append(thread)
-        print("Started.", flush=True)
-
-    # Wait for everything to be finished.
-    for thread in threads:
-        thread.join()
-        print("Thread finished", flush=True)
-    print("Range finished.", flush=True)
+def get_results(queue, index_no):
+    try:
+        url = f'https://result.doenets.lk/result/service/AlResult?index={index_no}&nic='
+        results = fetch_results(url)
+        if valid_result(results):
+            logging.info(f'Results fetched for index no: {index_no}')
+            queue.put(results)
+        else:
+            logging.info(f'Results failed for index no: {index_no}')
+    except:
+        logging.error(f'ERROR in index no: {index_no}')
 
 
-def main():
-    step = 100
-    # for boys
-    for i in range((366//step) + 1):
-        save_results_for_range(i*step, (i*step)+step)
-        print("All threads finished.", flush=True)
-
-    # for girls
-    for i in range((366//step) + 1):
-        save_results_for_range(500 + (i*step), 500 + (i*step) + step)
-        print("All threads finished.", flush=True)
+def produce(index_queue):
+    logging.info('Producer: Running')
+    for index_no in range(starting_index, ending_index):
+        index_queue.put(index_no)
+    index_queue.put(None)    # signal that there are no further items
+    logging.info('Producer: Done')
 
 
-main()
+def consume(index_queue, results_queue, identifier):
+    logging.info(f'Consumer {identifier}: Running')
+    while True:
+        index_no = index_queue.get()
+        if index_no is None:  # check for stop
+            index_queue.put(None)  # add the signal back for other consumers
+            break
+        logging.info(f'>Consumer {identifier} got {index_no}')
+        get_results(results_queue, index_no)
+    logging.info(f'Consumer {identifier}: Done')
+
+
+def file_write(queue):
+    logging.info('File writer: Running')
+    while True:
+        result = queue.get()
+        if result is None:  # check for stop
+            break
+        append_to_file(result)
+    logging.info('File writer: Done')
+
+
+results_queue = Queue()
+file_writer = Thread(target=file_write, args=(results_queue,))
+file_writer.start()
+
+index_queue = Queue()
+consumers = [Thread(target=consume, args=(index_queue, results_queue, thread_no)) for thread_no in range(thread_count)]
+for consumer in consumers:
+    consumer.start()
+
+producer = Thread(target=produce, args=(index_queue,))
+producer.start()
+producer.join()
+for consumer in consumers:
+    consumer.join()
+results_queue.put(None)  # Finish file writing
+
+file_writer.join()
+logging.info('Everything: Done')
