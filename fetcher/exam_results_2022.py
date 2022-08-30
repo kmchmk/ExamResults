@@ -5,11 +5,11 @@ import requests
 
 starting_index = 5000000
 ending_index = 10000000
-thread_count = 100
+thread_count = 500
 file_name = "results_2022.txt"
 
 
-logging.basicConfig(filename='application.log', encoding='utf-8', level=logging.INFO)
+logging.basicConfig(filename='application.log', level=logging.INFO)
 
 
 def fetch_results(url):
