@@ -1,1 +1,0 @@
-{"examination":null,"year":null,"name":null,"indexNo":null,"nic":null,"districtRank":null,"islandRank":null,"marks":null,"status":null,"zScore":null,"stream":null,"subjectResults":[],"studentInfo":[],"errMsge":"Connection Time Out. Try again later."}
