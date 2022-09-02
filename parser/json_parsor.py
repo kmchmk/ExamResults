@@ -51,3 +51,5 @@ results = conn.execute('SELECT COUNT(*) FROM RESULT')
 for result in results:
     print(result)
 conn.close()
+
+print("Edited for testing")
